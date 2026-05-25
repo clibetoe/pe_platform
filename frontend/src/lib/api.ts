@@ -99,3 +99,13 @@ export const classApi = {
   students: (params?: Record<string, unknown>) =>
     api.get("/auth/users/", { params: { role: "student", ...params } }),
 };
+
+export const schoolApi = {
+  list: (params?: Record<string, unknown>) => api.get("/auth/schools/", { params }),
+  create: (data: { name: string; location: string }) => api.post("/auth/schools/", data),
+  delete: (id: number) => api.delete(`/auth/schools/${id}/`),
+};
+
+export const usersApi = {
+  list: (params?: Record<string, unknown>) => api.get("/auth/users/", { params }),
+};

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,14 +15,26 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const { login, user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const justRegistered = searchParams.get("registered") === "1";
   const [error, setError] = useState("");
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+
+  useEffect(() => {
+    if (!user) return;
+    const dest = ["admin", "super_admin"].includes(user.role)
+      ? "/admin/dashboard"
+      : ["teacher", "coach"].includes(user.role)
+      ? "/teacher/dashboard"
+      : "/student/dashboard";
+    router.replace(dest);
+  }, [user, router]);
 
   const onSubmit = async (data: FormData) => {
     setError("");
@@ -32,16 +44,6 @@ export default function LoginPage() {
       setError("Invalid email or password. Please try again.");
     }
   };
-
-  if (user) {
-    const dest = ["admin", "super_admin"].includes(user.role)
-      ? "/admin/dashboard"
-      : ["teacher", "coach"].includes(user.role)
-      ? "/teacher/dashboard"
-      : "/student/dashboard";
-    router.replace(dest);
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-900 via-brand-700 to-brand-500 flex items-center justify-center p-4">
@@ -55,6 +57,12 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {justRegistered && (
+            <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 mb-5">
+              Account created! You can now sign in.
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <Input
               {...register("email")}
@@ -97,5 +105,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

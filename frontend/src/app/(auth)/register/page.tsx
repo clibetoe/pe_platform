@@ -18,6 +18,17 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
+type ApiErrors = Record<string, string[]>;
+
+function extractError(e: unknown): string {
+  const data = (e as { response?: { data?: ApiErrors } })?.response?.data;
+  if (!data) return "Registration failed. Please try again.";
+  const firstKey = Object.keys(data)[0];
+  if (!firstKey) return "Registration failed. Please try again.";
+  const msgs = data[firstKey];
+  return Array.isArray(msgs) ? `${firstKey !== "non_field_errors" ? `${firstKey}: ` : ""}${msgs[0]}` : "Registration failed.";
+}
+
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -33,8 +44,7 @@ export default function RegisterPage() {
       await authApi.register(data);
       router.push("/login?registered=1");
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { email?: string[] } } })?.response?.data?.email?.[0];
-      setError(msg ?? "Registration failed. Please try again.");
+      setError(extractError(e));
     }
   };
 

@@ -28,6 +28,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ["email", "password", "first_name", "last_name", "role", "school"]
 
+    def validate_role(self, value):
+        if value not in [User.STUDENT, User.TEACHER]:
+            raise serializers.ValidationError("Self-registration is only available for students and teachers.")
+        return value
+
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
