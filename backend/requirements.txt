@@ -1,0 +1,8 @@
+Django==4.2.13
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.3.1
+django-cors-headers==4.4.0
+django-environ==0.11.2
+Pillow
+qrcode==7.4.2
+django-filter==24.3
