@@ -17,6 +17,27 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
+type ApiErrorResponse = {
+  detail?: string;
+  non_field_errors?: string[];
+  [key: string]: string | string[] | undefined;
+};
+
+function extractErrorMessage(error: unknown) {
+  const data = (error as { response?: { data?: ApiErrorResponse } })?.response?.data;
+  if (!data) return "Unable to reach the server. Please try again.";
+  if (typeof data.detail === "string" && data.detail) return data.detail;
+
+  const firstField = Object.keys(data).find((key) => key !== "detail");
+  if (!firstField) return "Login failed. Please try again.";
+
+  const value = data[firstField];
+  if (Array.isArray(value) && value[0]) return value[0];
+  if (typeof value === "string" && value) return value;
+
+  return "Login failed. Please try again.";
+}
+
 function LoginForm() {
   const { login, user } = useAuth();
   const router = useRouter();
@@ -43,8 +64,8 @@ function LoginForm() {
     setError("");
     try {
       await login(data.email, data.password);
-    } catch {
-      setError("Invalid email or password. Please try again.");
+    } catch (error: unknown) {
+      setError(extractErrorMessage(error));
     }
   };
 

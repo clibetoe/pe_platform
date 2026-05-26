@@ -1,6 +1,7 @@
 import environ
 from pathlib import Path
 from datetime import timedelta
+from urllib.parse import urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(DEBUG=(bool, True))
@@ -9,6 +10,25 @@ environ.Env.read_env(BASE_DIR / ".env")
 SECRET_KEY = env("SECRET_KEY", default="dev-secret-key-change-in-production")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+
+DEFAULT_FRONTEND_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://localhost:3000",
+    "https://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "https://127.0.0.1:3000",
+    "https://127.0.0.1:3001",
+]
+
+DEFAULT_CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "https://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://127.0.0.1:8000",
+    *DEFAULT_FRONTEND_ORIGINS,
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -107,6 +127,33 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = env.list(
     "CORS_ALLOWED_ORIGINS",
-    default=["http://localhost:3000", "http://localhost:3001"],
+    default=DEFAULT_FRONTEND_ORIGINS,
 )
+CSRF_TRUSTED_ORIGINS = list(
+    dict.fromkeys(
+        [
+            *DEFAULT_CSRF_TRUSTED_ORIGINS,
+            *env.list("CSRF_TRUSTED_ORIGINS", default=[]),
+        ]
+    )
+)
+
+# If NEXT_PUBLIC_API_URL is set (e.g. in Codespaces), add its origin to CSRF trusted origins
+NEXT_PUBLIC_API_URL = env("NEXT_PUBLIC_API_URL", default=None)
+
+if NEXT_PUBLIC_API_URL:
+    try:
+        parsed = urlparse(NEXT_PUBLIC_API_URL)
+        origin = f"{parsed.scheme}://{parsed.netloc}"
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
+    except Exception:
+        # ignore malformed URL in env
+        pass
 CORS_ALLOW_CREDENTIALS = True
+
+# Allow GitHub Codespaces / GitHub.dev hostnames via regex (e.g. *.app.github.dev)
+CORS_ALLOWED_ORIGIN_REGEXES = env.list(
+    "CORS_ALLOWED_ORIGIN_REGEXES",
+    default=[r"^https?://.*\.app\.github\.dev$"],
+)

@@ -1,8 +1,33 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
+function resolveApiBaseUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (configuredUrl) return configuredUrl;
+
+  if (typeof window !== "undefined") {
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    // GitHub Codespaces / GitHub.dev exposes hosts like
+    // <name>-3000.app.github.dev and <name>-8000.app.github.dev.
+    // If running on a -3000 host, map to the corresponding -8000 backend host.
+    if (hostname.endsWith(".app.github.dev") && hostname.includes("-3000")) {
+      const apiHost = hostname.replace("-3000", "-8000");
+      return `${protocol}//${apiHost}/api`;
+    }
+    // If frontend served on localhost:3000, talk to localhost:8000
+    if (window.location.port === "3000") {
+      return `${protocol}//${window.location.hostname}:8000/api`;
+    }
+    // Fallback to localhost backend
+    return `${protocol}//localhost:8000/api`;
+  }
+
+  return "http://localhost:8000/api";
+}
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
+  baseURL: resolveApiBaseUrl(),
   headers: { "Content-Type": "application/json" },
 });
 
@@ -22,7 +47,7 @@ api.interceptors.response.use(
       if (refresh) {
         try {
           const { data } = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"}/auth/token/refresh/`,
+            `${resolveApiBaseUrl()}/auth/token/refresh/`,
             { refresh }
           );
           Cookies.set("access_token", data.access, { expires: 1 });
