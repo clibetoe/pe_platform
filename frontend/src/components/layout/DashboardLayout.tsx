@@ -35,11 +35,11 @@ export function DashboardLayout({ children, requiredRoles }: DashboardLayoutProp
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-brand-950">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden min-h-screen">
+      <div className="flex-1 flex flex-col overflow-hidden min-h-screen rounded-tl-2xl rounded-bl-2xl overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto dashboard-bg">
           <div className="max-w-6xl mx-auto px-6 py-8">{children}</div>
         </main>
       </div>
