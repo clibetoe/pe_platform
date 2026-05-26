@@ -110,24 +110,28 @@ export default function TeacherDashboardPage() {
               ) : (
                 <div className="space-y-3">
                   {data.classes.map((klass) => (
-                    <div key={klass.id} className="flex items-start gap-4 p-4 bg-gradient-to-r from-gray-50 to-emerald-50/30 rounded-xl border border-gray-100 hover:border-emerald-100 transition-colors">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
-                        <Users size={16} className="text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-semibold text-gray-900 truncate">{klass.name}</p>
-                          <Badge variant="info">{klass.student_count} students</Badge>
+                    <div key={klass.id} className="relative overflow-hidden p-4 bg-gradient-to-r from-gray-50 to-emerald-50/30 rounded-xl border border-gray-100 hover:border-emerald-100 transition-colors">
+                      <div className="pointer-events-none absolute -top-3 -right-3 w-14 h-14 rounded-full bg-white/60" />
+                      <div className="pointer-events-none absolute -bottom-3 -left-3 w-10 h-10 rounded-full bg-white/50" />
+                      <div className="relative z-10 flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
+                          <Users size={16} className="text-white" />
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-gray-500 mb-2">
-                          <span>Avg Score: <strong className="text-gray-900">{klass.avg_score}%</strong></span>
-                          <span>Lessons done: <strong className="text-gray-900">{klass.completed_lessons}</strong></span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-semibold text-gray-900 truncate">{klass.name}</p>
+                            <Badge variant="info">{klass.student_count} students</Badge>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-gray-500 mb-2">
+                            <span>Avg Score: <strong className="text-gray-900">{klass.avg_score}%</strong></span>
+                            <span>Lessons done: <strong className="text-gray-900">{klass.completed_lessons}</strong></span>
+                          </div>
+                          <ProgressBar value={klass.avg_score} max={100} />
                         </div>
-                        <ProgressBar value={klass.avg_score} max={100} />
+                        <Link href={`/teacher/classes/${klass.id}`} className="text-xs text-brand-600 hover:text-brand-700 font-semibold flex-shrink-0 flex items-center gap-1">
+                          View <ChevronRight size={12} />
+                        </Link>
                       </div>
-                      <Link href={`/teacher/classes/${klass.id}`} className="text-xs text-brand-600 hover:text-brand-700 font-semibold flex-shrink-0 flex items-center gap-1">
-                        View <ChevronRight size={12} />
-                      </Link>
                     </div>
                   ))}
                 </div>

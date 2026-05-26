@@ -75,12 +75,14 @@ export default function QuizzesPage() {
               return (
                 <div
                   key={a.id}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden flex flex-col group hover:-translate-y-0.5 hover:shadow-card-hover transition-all duration-200"
+                  className="relative bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden flex flex-col group hover:-translate-y-0.5 hover:shadow-card-hover transition-all duration-200"
                 >
                   {/* Colored top strip */}
                   <div className={`h-1.5 w-full bg-gradient-to-r ${accent}`} />
+                  <div className="pointer-events-none absolute -top-8 -right-8 w-28 h-28 rounded-full bg-brand-400/[0.05]" />
+                  <div className="pointer-events-none absolute -bottom-6 -left-6 w-20 h-20 rounded-full bg-accent-400/[0.06]" />
 
-                  <div className="p-5 flex flex-col flex-1">
+                  <div className="relative z-10 p-5 flex flex-col flex-1">
                     {/* Lesson label */}
                     {a.lesson_title && (
                       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 truncate">

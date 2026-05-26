@@ -87,9 +87,11 @@ export default function AchievementsPage() {
               { label: "XP Collected", value: totalXP, color: "text-amber-600", bg: "from-amber-50 to-orange-50", ring: "ring-amber-100" },
               { label: "Badges Left", value: allBadgeTypes.length - achievements.length, color: "text-gray-500", bg: "from-gray-50 to-slate-50", ring: "ring-gray-100" },
             ].map(({ label, value, color, bg, ring }) => (
-              <div key={label} className={`rounded-2xl bg-gradient-to-br ${bg} border border-white ring-1 ${ring} p-5 text-center`}>
-                <p className={`font-display font-extrabold text-3xl ${color}`}>{value}</p>
-                <p className="text-xs text-gray-500 font-medium mt-1">{label}</p>
+              <div key={label} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${bg} border border-white ring-1 ${ring} p-5 text-center`}>
+                <div className="pointer-events-none absolute -top-4 -right-4 w-16 h-16 rounded-full bg-white/40" />
+                <div className="pointer-events-none absolute -bottom-3 -left-3 w-12 h-12 rounded-full bg-white/30" />
+                <p className={`relative font-display font-extrabold text-3xl ${color}`}>{value}</p>
+                <p className="relative text-xs text-gray-500 font-medium mt-1">{label}</p>
               </div>
             ))}
           </div>
@@ -120,8 +122,14 @@ export default function AchievementsPage() {
                   {isEarned && (
                     <div className={`h-1 w-full bg-gradient-to-r ${cfg.gradient}`} />
                   )}
+                  {isEarned && (
+                    <>
+                      <div className="pointer-events-none absolute -top-6 -right-6 w-24 h-24 rounded-full bg-brand-400/[0.05]" />
+                      <div className="pointer-events-none absolute -bottom-5 -left-5 w-20 h-20 rounded-full bg-accent-400/[0.06]" />
+                    </>
+                  )}
 
-                  <div className="p-7">
+                  <div className="relative z-10 p-7">
                     {/* Badge circle */}
                     <div className="relative inline-flex mb-5">
                       <div className={`w-18 h-18 w-[72px] h-[72px] rounded-2xl flex items-center justify-center shadow-lg ${cfg.shadow} ${

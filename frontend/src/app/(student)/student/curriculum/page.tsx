@@ -86,8 +86,10 @@ export default function CurriculumPage() {
               return (
                 <div
                   key={subject.id}
-                  className={`rounded-2xl border border-white ring-1 ${g.ring} overflow-hidden bg-gradient-to-br ${g.bg} shadow-card transition-all duration-200`}
+                  className={`relative rounded-2xl border border-white ring-1 ${g.ring} overflow-hidden bg-gradient-to-br ${g.bg} shadow-card transition-all duration-200`}
                 >
+                  <div className="pointer-events-none absolute -top-5 -right-5 w-20 h-20 rounded-full bg-white/40" />
+                  <div className="pointer-events-none absolute -bottom-4 -left-4 w-14 h-14 rounded-full bg-white/30" />
                   {/* Subject header */}
                   <button
                     onClick={() => toggle(subject.id)}
@@ -151,14 +153,16 @@ function SubjectTopics({ subjectId, gradient }: { subjectId: number; gradient: t
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {subject.topics.map((topic) => (
-        <div key={topic.id} className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
+        <div key={topic.id} className="relative bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
+          <div className="pointer-events-none absolute -top-4 -right-4 w-14 h-14 rounded-full bg-brand-400/[0.05]" />
+          <div className="pointer-events-none absolute -bottom-3 -left-3 w-10 h-10 rounded-full bg-accent-400/[0.06]" />
           {/* Topic header */}
-          <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-50">
+          <div className="relative z-10 flex items-center gap-2.5 px-4 py-3 border-b border-gray-50">
             <Layers size={14} className={gradient.text} />
             <h3 className="text-sm font-bold text-gray-800 truncate">{topic.title}</h3>
           </div>
           {/* Lessons */}
-          <div className="divide-y divide-gray-50">
+          <div className="relative z-10 divide-y divide-gray-50">
             {topic.lessons?.slice(0, 4).map((lesson) => (
               <Link
                 key={lesson.id}
