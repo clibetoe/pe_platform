@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Sidebar } from "./Sidebar";
+import { TopBar } from "./TopBar";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -36,9 +37,12 @@ export function DashboardLayout({ children, requiredRoles }: DashboardLayoutProp
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
-      <main className="flex-1 overflow-auto">
-        <div className="max-w-6xl mx-auto px-6 py-8">{children}</div>
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden min-h-screen">
+        <TopBar />
+        <main className="flex-1 overflow-auto">
+          <div className="max-w-6xl mx-auto px-6 py-8">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

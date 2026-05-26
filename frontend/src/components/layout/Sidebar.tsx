@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import {
   BookOpen, LayoutDashboard, ClipboardList, Award,
-  Users, BarChart2, LogOut, Trophy, Star,
+  Users, BarChart2, Trophy, Star,
 } from "lucide-react";
 
 interface NavItem {
@@ -40,7 +40,7 @@ const adminNav: NavItem[] = [
 ];
 
 export function Sidebar() {
-  const { user, logout, isRole } = useAuth();
+  const { user, isRole } = useAuth();
   const pathname = usePathname();
 
   const nav = isRole("admin", "super_admin")
@@ -50,58 +50,65 @@ export function Sidebar() {
     : studentNav;
 
   return (
-    <aside className="w-64 min-h-screen bg-brand-900 text-white flex flex-col">
-      <div className="px-6 py-5 border-b border-brand-700">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center font-bold text-sm">PE</div>
-          <div>
-            <p className="font-bold text-sm leading-none">PE Platform</p>
-            <p className="text-xs text-brand-300 mt-0.5">Olympic Values</p>
+    <aside className="w-64 min-h-screen bg-gradient-to-b from-brand-900 to-brand-950 text-white flex flex-col flex-shrink-0">
+      {/* Logo */}
+      <div className="px-5 pt-6 pb-4">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center font-display font-bold text-sm text-white shadow-sm group-hover:shadow-glow-accent transition-shadow">
+            PE
           </div>
-        </div>
+          <div>
+            <p className="font-display font-bold text-white text-sm leading-none">PE Platform</p>
+            <p className="text-xs text-white/35 mt-0.5">Olympic Values</p>
+          </div>
+        </Link>
       </div>
 
+      <div className="mx-5 h-px bg-white/8 mb-3" />
+
+      {/* Nav items */}
+      <nav className="flex-1 px-3 py-2 space-y-0.5">
+        {nav.map(({ href, label, icon: Icon }) => {
+          const active = pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "nav-link",
+                active ? "nav-link-active" : "nav-link-inactive"
+              )}
+            >
+              <Icon
+                size={17}
+                className={active ? "text-white" : "text-white/45"}
+              />
+              <span className={active ? "text-white font-semibold" : "text-white/65"}>
+                {label}
+              </span>
+              {active && (
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-accent-400" />
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* User strip */}
       {user && (
-        <div className="px-6 py-4 border-b border-brand-700">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center text-sm font-bold uppercase">
+        <div className="px-3 pb-5">
+          <div className="mx-2 h-px bg-white/8 mb-4" />
+          <div className="flex items-center gap-3 px-3 py-2">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
               {user.first_name[0]}{user.last_name[0]}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium truncate">{user.full_name}</p>
-              <p className="text-xs text-brand-300 capitalize">{user.role.replace("_", " ")}</p>
+              <p className="text-sm font-semibold text-white truncate leading-none">{user.full_name}</p>
+              <p className="text-xs text-white/35 capitalize mt-0.5">{user.role.replace("_", " ")}</p>
             </div>
           </div>
         </div>
       )}
-
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {nav.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-              pathname.startsWith(href)
-                ? "bg-brand-600 text-white"
-                : "text-brand-200 hover:bg-brand-800 hover:text-white"
-            )}
-          >
-            <Icon size={18} />
-            {label}
-          </Link>
-        ))}
-      </nav>
-
-      <div className="px-3 py-4 border-t border-brand-700">
-        <button
-          onClick={logout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-brand-200 hover:bg-brand-800 hover:text-white transition-colors"
-        >
-          <LogOut size={18} />
-          Sign Out
-        </button>
-      </div>
     </aside>
   );
 }
