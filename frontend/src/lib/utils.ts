@@ -11,9 +11,9 @@ export function formatDate(iso: string) {
   });
 }
 
-export function formatScore(score: number | null) {
-  if (score === null) return "—";
-  return `${score.toFixed(1)}%`;
+export function formatScore(score: number | string | null) {
+  if (score === null || score === undefined) return "—";
+  return `${Number(score).toFixed(1)}%`;
 }
 
 export function roleLabel(role: string) {
