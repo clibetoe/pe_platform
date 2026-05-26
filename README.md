@@ -1,4 +1,6 @@
 # PE Platform — Setup Guide
+https://silver-engine-4j9wqjqg5q6xh7pqg-3000.app.github.dev/
+https://silver-engine-4j9wqjqg5q6xh7pqg-8000.app.github.dev/
 
 Secondary School Physical Education & Olympic Values Education Platform  
 **Stack:** Django 4.2 + DRF · PostgreSQL · Next.js 14 · Tailwind CSS
