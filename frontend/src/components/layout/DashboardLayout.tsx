@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
+import { ProductTour } from "@/components/tour/ProductTour";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ export function DashboardLayout({ children, requiredRoles }: DashboardLayoutProp
 
   return (
     <div className="flex min-h-screen bg-brand-950">
+      <ProductTour />
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden min-h-screen rounded-tl-2xl rounded-bl-2xl overflow-hidden">
         <TopBar />

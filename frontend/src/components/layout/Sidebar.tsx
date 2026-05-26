@@ -13,30 +13,31 @@ interface NavItem {
   href: string;
   label: string;
   icon: React.ElementType;
+  tourId: string;
 }
 
 const studentNav: NavItem[] = [
-  { href: "/student/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/student/curriculum", label: "Curriculum", icon: BookOpen },
-  { href: "/student/quizzes", label: "Quizzes", icon: ClipboardList },
-  { href: "/student/certificates", label: "Certificates", icon: Award },
-  { href: "/student/achievements", label: "Achievements", icon: Trophy },
+  { href: "/student/dashboard",    label: "Dashboard",    icon: LayoutDashboard, tourId: "nav-dashboard"    },
+  { href: "/student/curriculum",   label: "Curriculum",   icon: BookOpen,        tourId: "nav-curriculum"   },
+  { href: "/student/quizzes",      label: "Quizzes",      icon: ClipboardList,   tourId: "nav-quizzes"      },
+  { href: "/student/certificates", label: "Certificates", icon: Award,           tourId: "nav-certificates" },
+  { href: "/student/achievements", label: "Achievements", icon: Trophy,          tourId: "nav-achievements" },
 ];
 
 const teacherNav: NavItem[] = [
-  { href: "/teacher/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/teacher/classes", label: "My Classes", icon: Users },
-  { href: "/teacher/curriculum", label: "Curriculum", icon: BookOpen },
-  { href: "/teacher/assessments", label: "Assessments", icon: ClipboardList },
-  { href: "/teacher/analytics", label: "Analytics", icon: BarChart2 },
+  { href: "/teacher/dashboard",   label: "Dashboard",   icon: LayoutDashboard, tourId: "nav-dashboard"   },
+  { href: "/teacher/classes",     label: "My Classes",  icon: Users,           tourId: "nav-classes"     },
+  { href: "/teacher/curriculum",  label: "Curriculum",  icon: BookOpen,        tourId: "nav-curriculum"  },
+  { href: "/teacher/assessments", label: "Assessments", icon: ClipboardList,   tourId: "nav-assessments" },
+  { href: "/teacher/analytics",   label: "Analytics",   icon: BarChart2,       tourId: "nav-analytics"   },
 ];
 
 const adminNav: NavItem[] = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/schools", label: "Schools", icon: Star },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/curriculum", label: "Curriculum", icon: BookOpen },
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart2 },
+  { href: "/admin/dashboard",  label: "Dashboard",  icon: LayoutDashboard, tourId: "nav-dashboard"  },
+  { href: "/admin/schools",    label: "Schools",    icon: Star,            tourId: "nav-schools"    },
+  { href: "/admin/users",      label: "Users",      icon: Users,           tourId: "nav-users"      },
+  { href: "/admin/curriculum", label: "Curriculum", icon: BookOpen,        tourId: "nav-curriculum" },
+  { href: "/admin/analytics",  label: "Analytics",  icon: BarChart2,       tourId: "nav-analytics"  },
 ];
 
 export function Sidebar() {
@@ -50,7 +51,7 @@ export function Sidebar() {
     : studentNav;
 
   return (
-    <aside className="w-64 min-h-screen bg-gradient-to-b from-brand-900 to-brand-950 text-white flex flex-col flex-shrink-0">
+    <aside data-tour="sidebar" className="w-64 min-h-screen bg-gradient-to-b from-brand-900 to-brand-950 text-white flex flex-col flex-shrink-0">
       {/* Logo */}
       <div className="px-5 pt-6 pb-4">
         <Link href="/" className="flex items-center gap-3 group">
@@ -68,12 +69,13 @@ export function Sidebar() {
 
       {/* Nav items */}
       <nav className="flex-1 px-3 py-2 space-y-0.5">
-        {nav.map(({ href, label, icon: Icon }) => {
+        {nav.map(({ href, label, icon: Icon, tourId }) => {
           const active = pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
+              data-tour={tourId}
               className={cn(
                 "nav-link",
                 active ? "nav-link-active" : "nav-link-inactive"
@@ -96,7 +98,7 @@ export function Sidebar() {
 
       {/* User strip */}
       {user && (
-        <div className="px-3 pb-5">
+        <div data-tour="user-strip" className="px-3 pb-5">
           <div className="mx-2 h-px bg-white/8 mb-4" />
           <div className="flex items-center gap-3 px-3 py-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
