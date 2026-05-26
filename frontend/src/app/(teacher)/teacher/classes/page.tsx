@@ -26,6 +26,7 @@ export default function ClassesPage() {
   const [classes, setClasses] = useState<Class[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<{ name: string }>();
 
   useEffect(() => {
@@ -33,13 +34,28 @@ export default function ClassesPage() {
   }, []);
 
   const onCreate = async (data: { name: string }) => {
-    if (!user?.school) return;
+    setFormError(null);
+    if (!user?.school) {
+      setFormError("Your account is not linked to a school. Ask an admin to assign you to one.");
+      return;
+    }
     setCreating(true);
-    const r = await classApi.create({ name: data.name, school: Number(user.school) });
-    setClasses((prev) => [...prev, r.data]);
-    reset();
-    setShowForm(false);
-    setCreating(false);
+    try {
+      const r = await classApi.create({ name: data.name, school: Number(user.school) });
+      setClasses((prev) => [...prev, r.data]);
+      reset();
+      setShowForm(false);
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { detail?: string; name?: string[] } } })
+          ?.response?.data?.detail ??
+        (err as { response?: { data?: { name?: string[] } } })
+          ?.response?.data?.name?.[0] ??
+        "Failed to create class. Please try again.";
+      setFormError(msg);
+    } finally {
+      setCreating(false);
+    }
   };
 
   return (
@@ -64,7 +80,7 @@ export default function ClassesPage() {
             </div>
             <div className="flex-shrink-0">
               <Button
-                onClick={() => setShowForm(!showForm)}
+                onClick={() => { setShowForm(!showForm); setFormError(null); }}
                 className="bg-white/15 border border-white/25 hover:bg-white/25 text-white"
               >
                 {showForm ? <X size={16} /> : <Plus size={16} />}
@@ -94,6 +110,11 @@ export default function ClassesPage() {
                 </div>
                 <Button type="submit" loading={creating}>Create Class</Button>
               </form>
+              {formError && (
+                <p className="mt-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5">
+                  {formError}
+                </p>
+              )}
             </div>
           </div>
         )}
