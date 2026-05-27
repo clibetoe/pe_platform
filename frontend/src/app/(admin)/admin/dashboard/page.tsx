@@ -17,6 +17,7 @@ const adminSections = [
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<PlatformStats | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -32,7 +33,11 @@ export default function AdminDashboardPage() {
         classes: Array.isArray(classData) ? classData.length : (classRes.data.count ?? 0),
         avgScore: analyticsRes.data.avg_score ?? 0,
       });
-    }).catch(() => {});
+    }).catch(() => {
+      setStats(null);
+    }).finally(() => {
+      setLoaded(true);
+    });
   }, []);
 
   const statCards = stats
@@ -68,7 +73,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Stat cards */}
-        {statCards.length > 0 ? (
+        {loaded && statCards.length > 0 ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {statCards.map(({ label, value, sub, icon: Icon, gradient, bg, ring }) => (
               <div key={label} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${bg} border border-white ring-1 ${ring} p-5 group hover:-translate-y-0.5 transition-all duration-200`}>
@@ -85,9 +90,13 @@ export default function AdminDashboardPage() {
               </div>
             ))}
           </div>
-        ) : (
+        ) : !loaded ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => <div key={i} className="skeleton h-32" />)}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-gray-200 bg-white/70 p-6 text-sm text-gray-500">
+            Platform metrics are unavailable right now. Navigation and access remain available.
           </div>
         )}
 

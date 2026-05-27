@@ -38,11 +38,31 @@ export default function StudentDashboard() {
   const [stats, setStats] = useState<MyStats | null>(null);
   const [recentAttempts, setRecentAttempts] = useState<Attempt[]>([]);
   const [certs, setCerts] = useState<Certificate[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    analyticsApi.myStats().then((r) => setStats(r.data));
-    assessmentApi.attempts().then((r) => setRecentAttempts(r.data.results?.slice(0, 5) ?? []));
-    assessmentApi.certificates().then((r) => setCerts(r.data.results ?? []));
+    let active = true;
+
+    Promise.allSettled([
+      analyticsApi.myStats(),
+      assessmentApi.attempts(),
+      assessmentApi.certificates(),
+    ]).then(([statsRes, attemptsRes, certsRes]) => {
+      if (!active) return;
+
+      if (statsRes.status === "fulfilled") setStats(statsRes.value.data);
+      if (attemptsRes.status === "fulfilled") {
+        setRecentAttempts(attemptsRes.value.data.results?.slice(0, 5) ?? []);
+      }
+      if (certsRes.status === "fulfilled") {
+        setCerts(certsRes.value.data.results ?? []);
+      }
+      setLoaded(true);
+    });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const progressPct = stats
@@ -98,7 +118,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Stat cards */}
-        {statCards.length > 0 ? (
+        {loaded && statCards.length > 0 ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {statCards.map(({ label, value, sub, icon: Icon, gradient, bg, ring }) => (
               <div key={label} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${bg} border border-white ring-1 ${ring} p-5 group hover:-translate-y-0.5 transition-all duration-200`}>
@@ -116,9 +136,13 @@ export default function StudentDashboard() {
               </div>
             ))}
           </div>
-        ) : (
+        ) : !loaded ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => <div key={i} className="skeleton h-32" />)}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-gray-200 bg-white/70 p-6 text-sm text-gray-500">
+            Dashboard data is unavailable right now. Your account is still signed in.
           </div>
         )}
 

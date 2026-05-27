@@ -8,6 +8,7 @@ import {
   BookOpen, Award, Users, BarChart2, ChevronRight,
   Target, Zap, Shield, Trophy, Star, Play, Menu, X,
 } from "lucide-react";
+import Logo from "@/components/brand/Logo";
 
 const subjects = [
   { title: "Athletics", lessons: 24, icon: "🏃", gradient: "from-orange-500 to-rose-600" },
@@ -106,19 +107,9 @@ export default function HomePage() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-display font-bold text-sm shadow-sm">
-              PE
-            </div>
-            <div className="hidden sm:block">
-              <p className={`font-display font-bold text-sm leading-none transition-colors ${scrolled ? "text-gray-900" : "text-white"}`}>
-                PE Platform
-              </p>
-              <p className={`text-xs leading-none mt-0.5 transition-colors ${scrolled ? "text-gray-400" : "text-white/50"}`}>
-                Olympic Values Education
-              </p>
-            </div>
-          </Link>
+          <div className="flex items-center gap-2.5 group">
+            <Logo compact />
+          </div>
 
           <div className="hidden md:flex items-center gap-8">
             {["Subjects", "How It Works", "Features"].map((label) => (
@@ -463,9 +454,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center font-display font-bold text-sm">
-                PE
-              </div>
+              <Logo compact />
               <div>
                 <p className="font-display font-bold text-sm">PE Platform</p>
                 <p className="text-xs text-gray-500">Olympic Values Education Programme</p>

@@ -9,7 +9,8 @@ import { z } from "zod";
 import { authApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { BookOpen, Award, Users, BarChart2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Award, Users, BarChart2 } from "lucide-react";
+import Logo from "@/components/brand/Logo";
 
 const schema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -127,9 +128,16 @@ export default function RegisterPage() {
       {/* Right — form panel */}
       <div className="w-full lg:w-7/12 xl:w-1/2 flex items-center justify-center p-8 bg-white overflow-y-auto">
         <div className="w-full max-w-md py-8">
-          <div className="flex items-center gap-2.5 mb-10 lg:hidden">
-            <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center font-display font-bold text-white text-sm">PE</div>
-            <span className="font-display font-bold text-gray-900">PE Platform</span>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors mb-6 lg:hidden"
+          >
+            <ArrowLeft size={16} />
+            Back to home
+          </Link>
+
+          <div className="mb-10 lg:hidden">
+            <Logo compact />
           </div>
 
           <h1 className="font-display font-extrabold text-3xl text-gray-900 mb-2">

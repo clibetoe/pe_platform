@@ -9,15 +9,23 @@ export function useTour() {
 
   useEffect(() => {
     if (!user) return;
-    const key = `pe_tour_${user.id}`;
-    if (!localStorage.getItem(key)) {
-      setShouldShow(true);
+    try {
+      const key = `pe_tour_${user.id}`;
+      if (!localStorage.getItem(key)) {
+        setShouldShow(true);
+      }
+    } catch {
+      setShouldShow(false);
     }
   }, [user]);
 
   const markDone = () => {
     if (!user) return;
-    localStorage.setItem(`pe_tour_${user.id}`, "1");
+    try {
+      localStorage.setItem(`pe_tour_${user.id}`, "1");
+    } catch {
+      // Ignore storage failures and keep the tour from blocking the UI.
+    }
     setShouldShow(false);
   };
 

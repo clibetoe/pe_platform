@@ -129,6 +129,10 @@ export function ProductTour() {
   useEffect(() => {
     if (!shouldShow || !user) return;
 
+    const media = window.matchMedia("(min-width: 1024px)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!media.matches || reducedMotion.matches) return;
+
     import("intro.js").then((mod) => {
       const introJs = (mod.default ?? mod) as (element?: HTMLElement) => ReturnType<typeof import("intro.js")["default"]>;
       const steps = isRole("admin", "super_admin")
