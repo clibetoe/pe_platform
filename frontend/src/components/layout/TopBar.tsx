@@ -3,7 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { Bell, ChevronDown, LogOut } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Menu } from "lucide-react";
+
+interface TopBarProps {
+  onMenuClick?: () => void;
+}
 
 const routeLabels: Record<string, string> = {
   dashboard: "Dashboard",
@@ -24,7 +28,7 @@ function getPageTitle(pathname: string): string {
   return routeLabels[last] ?? (last.charAt(0).toUpperCase() + last.slice(1).replace(/-/g, " "));
 }
 
-export function TopBar() {
+export function TopBar({ onMenuClick }: TopBarProps) {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -43,11 +47,20 @@ export function TopBar() {
   const initials = `${user.first_name[0] ?? ""}${user.last_name[0] ?? ""}`.toUpperCase();
 
   return (
-    <header className="h-16 bg-gradient-to-r from-brand-950 to-brand-900 topbar-glow flex items-center px-6 gap-4 flex-shrink-0 relative">
+    <header className="h-16 bg-gradient-to-r from-brand-950 to-brand-900 topbar-glow flex items-center px-4 sm:px-6 gap-3 sm:gap-4 flex-shrink-0 relative">
       {/* Subtle accent line at bottom */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-500/40 to-transparent" />
 
-      <h1 className="font-display font-bold text-xl text-white/90 flex-1 tracking-tight">
+      <button
+        type="button"
+        onClick={onMenuClick}
+        className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center text-white/75 hover:bg-white/10 hover:text-white transition-colors"
+        aria-label="Open navigation drawer"
+      >
+        <Menu size={18} />
+      </button>
+
+      <h1 className="font-display font-bold text-lg sm:text-xl text-white/90 flex-1 tracking-tight truncate">
         {getPageTitle(pathname)}
       </h1>
 
@@ -60,12 +73,12 @@ export function TopBar() {
         <div ref={ref} className="relative">
           <button
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl hover:bg-white/10 transition-colors"
+            className="flex items-center gap-2.5 pl-2 pr-2 sm:pr-3 py-1.5 rounded-xl hover:bg-white/10 transition-colors"
           >
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ring-2 ring-white/10">
               {initials}
             </div>
-            <div className="hidden sm:block text-left">
+            <div className="hidden md:block text-left">
               <p className="text-sm font-semibold text-white/90 leading-none">{user.full_name}</p>
               <p className="text-xs text-white/40 capitalize mt-0.5">{user.role.replace("_", " ")}</p>
             </div>

@@ -9,13 +9,35 @@ import { z } from "zod";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { CheckCircle2, Trophy, Award, Zap } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Trophy, Award, Zap } from "lucide-react";
+import Logo from "@/components/brand/Logo";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
 });
 type FormData = z.infer<typeof schema>;
+
+type ApiErrorResponse = {
+  detail?: string;
+  non_field_errors?: string[];
+  [key: string]: string | string[] | undefined;
+};
+
+function extractErrorMessage(error: unknown) {
+  const data = (error as { response?: { data?: ApiErrorResponse } })?.response?.data;
+  if (!data) return "Unable to reach the server. Please try again.";
+  if (typeof data.detail === "string" && data.detail) return data.detail;
+
+  const firstField = Object.keys(data).find((key) => key !== "detail");
+  if (!firstField) return "Login failed. Please try again.";
+
+  const value = data[firstField];
+  if (Array.isArray(value) && value[0]) return value[0];
+  if (typeof value === "string" && value) return value;
+
+  return "Login failed. Please try again.";
+}
 
 function LoginForm() {
   const { login, user } = useAuth();
@@ -43,8 +65,8 @@ function LoginForm() {
     setError("");
     try {
       await login(data.email, data.password);
-    } catch {
-      setError("Invalid email or password. Please try again.");
+    } catch (error: unknown) {
+      setError(extractErrorMessage(error));
     }
   };
 
@@ -122,9 +144,16 @@ function LoginForm() {
       {/* Right — form panel */}
       <div className="w-full lg:w-7/12 xl:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
-          <div className="flex items-center gap-2.5 mb-10 lg:hidden">
-            <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center font-display font-bold text-white text-sm">PE</div>
-            <span className="font-display font-bold text-gray-900">PE Platform</span>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors mb-6 lg:hidden"
+          >
+            <ArrowLeft size={16} />
+            Back to home
+          </Link>
+
+          <div className="mb-10 lg:hidden">
+            <Logo compact />
           </div>
 
           <h1 className="font-display font-extrabold text-3xl text-gray-900 mb-2">

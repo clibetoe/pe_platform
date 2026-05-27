@@ -10,7 +10,7 @@ class SchoolSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    school_name = serializers.CharField(source="school.name", read_only=True)
+    school_name = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -19,6 +19,9 @@ class UserSerializer(serializers.ModelSerializer):
             "role", "school", "school_name", "avatar", "created_at",
         ]
         read_only_fields = ["id", "created_at"]
+
+    def get_school_name(self, obj):
+        return obj.school.name if obj.school else None
 
 
 class RegisterSerializer(serializers.ModelSerializer):
