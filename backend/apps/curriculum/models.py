@@ -109,7 +109,7 @@ class Scenario(models.Model):
     options = models.JSONField()
     correct_answer = models.CharField(max_length=200)
     linked_value = models.ForeignKey(OVEPValue, on_delete=models.SET_NULL, null=True)
-    lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True)
+    lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True, related_name="scenarios")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

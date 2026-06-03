@@ -1,23 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { authApi } from "@/lib/api";
+import { authApi, schoolApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ArrowLeft, BookOpen, Award, Users, BarChart2 } from "lucide-react";
 import Logo from "@/components/brand/Logo";
+import type { School } from "@/types";
 
 const schema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["student", "teacher"]),
+  role: z.enum(["student", "teacher", "coach"]),
+  school: z.coerce.number({ invalid_type_error: "Please select a school" }).min(1, "Please select a school"),
 });
 type FormData = z.infer<typeof schema>;
 
@@ -41,9 +43,25 @@ const highlights = [
   { icon: Users, text: "Connect with teachers and classmates" },
 ];
 
+const ROLES = [
+  { value: "student", label: "Student", emoji: "🎓", desc: "I want to learn" },
+  { value: "teacher", label: "Teacher", emoji: "📚", desc: "I teach PE classes" },
+  { value: "coach", label: "Coach", emoji: "🏅", desc: "I coach sports teams" },
+] as const;
+
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [schools, setSchools] = useState<School[]>([]);
+  const [schoolsLoading, setSchoolsLoading] = useState(true);
+
+  useEffect(() => {
+    schoolApi
+      .list()
+      .then((res) => setSchools(res.data.results ?? res.data))
+      .catch(() => setSchools([]))
+      .finally(() => setSchoolsLoading(false));
+  }, []);
 
   const {
     register,
@@ -186,18 +204,16 @@ export default function RegisterPage() {
               error={errors.password?.message}
             />
 
+            {/* Role selector */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 I am a
               </label>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { value: "student", label: "Student", emoji: "🎓" },
-                  { value: "teacher", label: "Teacher", emoji: "📚" },
-                ].map(({ value, label, emoji }) => (
+              <div className="grid grid-cols-3 gap-3">
+                {ROLES.map(({ value, label, emoji, desc }) => (
                   <label
                     key={value}
-                    className="relative flex items-center gap-3 p-3.5 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-brand-300 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50"
+                    className="relative flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-brand-300 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50"
                   >
                     <input
                       {...register("role")}
@@ -207,9 +223,41 @@ export default function RegisterPage() {
                     />
                     <span className="text-xl">{emoji}</span>
                     <span className="text-sm font-semibold text-gray-700">{label}</span>
+                    <span className="text-xs text-gray-400 text-center leading-tight">{desc}</span>
                   </label>
                 ))}
               </div>
+            </div>
+
+            {/* School selector */}
+            <div>
+              <label htmlFor="school" className="block text-sm font-medium text-gray-700 mb-1.5">
+                School
+              </label>
+              <select
+                {...register("school")}
+                id="school"
+                disabled={schoolsLoading}
+                className={[
+                  "w-full rounded-xl border px-4 py-2.5 text-sm bg-white text-gray-900 appearance-none",
+                  "focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors",
+                  errors.school ? "border-red-400" : "border-gray-300 hover:border-gray-400",
+                  schoolsLoading ? "opacity-60 cursor-wait" : "",
+                ].join(" ")}
+              >
+                <option value="">
+                  {schoolsLoading ? "Loading schools…" : "Select your school"}
+                </option>
+                {schools.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                    {s.location ? ` — ${s.location}` : ""}
+                  </option>
+                ))}
+              </select>
+              {errors.school && (
+                <p className="mt-1 text-xs text-red-600">{errors.school.message}</p>
+              )}
             </div>
 
             {error && (

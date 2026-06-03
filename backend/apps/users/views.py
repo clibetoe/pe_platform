@@ -59,6 +59,9 @@ class SchoolViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
             return [IsAdminOrAbove()]
+        # list and retrieve are public so the registration form can load schools
+        if self.action in ["list", "retrieve"]:
+            return [AllowAny()]
         return [IsAuthenticated()]
 
 
@@ -83,6 +86,13 @@ class ClassViewSet(viewsets.ModelViewSet):
         if self.action in ["create", "update", "partial_update", "destroy"]:
             return [IsTeacherOrAbove()]
         return [IsAuthenticated()]
+
+    def perform_create(self, serializer):
+        # If no teacher explicitly provided, assign the requesting user
+        if not serializer.validated_data.get("teacher"):
+            serializer.save(teacher=self.request.user)
+        else:
+            serializer.save()
 
     @action(detail=True, methods=["post"], permission_classes=[IsTeacherOrAbove])
     def add_student(self, request, pk=None):

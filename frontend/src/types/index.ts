@@ -41,6 +41,8 @@ export interface Subject {
 
 export interface Topic {
   id: number;
+  subject: number;
+  subject_name?: string;
   title: string;
   description: string;
   order: number;
@@ -50,9 +52,12 @@ export interface Topic {
 
 export interface Lesson {
   id: number;
+  topic: number;
   title: string;
   description: string;
+  content?: string;
   video_url: string;
+  pdf?: string | null;
   thumbnail: string | null;
   duration_minutes: number;
   order: number;
@@ -60,7 +65,6 @@ export interface Lesson {
   topic_title: string;
   subject_name: string;
   activity_count: number;
-  content?: string;
   activities?: Activity[];
   scenarios?: Scenario[];
 }

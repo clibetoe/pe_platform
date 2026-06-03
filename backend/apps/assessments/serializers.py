@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Assessment, Question, Attempt, Certificate, Achievement
+from apps.users.models import User
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -26,10 +27,16 @@ class AssessmentListSerializer(serializers.ModelSerializer):
 
 
 class AssessmentDetailSerializer(AssessmentListSerializer):
-    questions = QuestionSerializer(many=True, read_only=True)
+    questions = serializers.SerializerMethodField()
 
     class Meta(AssessmentListSerializer.Meta):
         fields = AssessmentListSerializer.Meta.fields + ["questions", "randomize_questions"]
+
+    def get_questions(self, obj):
+        request = self.context.get("request")
+        is_student = request and request.user.role == User.STUDENT
+        serializer_class = QuestionSerializer if is_student else QuestionWithAnswerSerializer
+        return serializer_class(obj.questions.all(), many=True).data
 
 
 class SubmitAttemptSerializer(serializers.Serializer):

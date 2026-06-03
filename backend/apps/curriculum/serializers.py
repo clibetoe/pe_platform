@@ -24,6 +24,7 @@ class ScenarioSerializer(serializers.ModelSerializer):
 
 
 class LessonListSerializer(serializers.ModelSerializer):
+    topic = serializers.PrimaryKeyRelatedField(queryset=Topic.objects.all())
     topic_title = serializers.CharField(source="topic.title", read_only=True)
     subject_name = serializers.CharField(source="topic.subject.name", read_only=True)
     activity_count = serializers.IntegerField(source="activities.count", read_only=True)
@@ -31,7 +32,7 @@ class LessonListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = [
-            "id", "title", "description", "video_url", "thumbnail",
+            "id", "topic", "title", "description", "content", "video_url", "pdf", "thumbnail",
             "duration_minutes", "order", "is_published",
             "topic_title", "subject_name", "activity_count",
         ]
@@ -46,12 +47,14 @@ class LessonDetailSerializer(LessonListSerializer):
 
 
 class TopicSerializer(serializers.ModelSerializer):
+    subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all())
+    subject_name = serializers.CharField(source="subject.name", read_only=True)
     lessons = LessonListSerializer(many=True, read_only=True)
     lesson_count = serializers.IntegerField(source="lessons.count", read_only=True)
 
     class Meta:
         model = Topic
-        fields = ["id", "title", "description", "order", "lesson_count", "lessons"]
+        fields = ["id", "subject", "subject_name", "title", "description", "order", "lesson_count", "lessons"]
 
 
 class SubjectSerializer(serializers.ModelSerializer):

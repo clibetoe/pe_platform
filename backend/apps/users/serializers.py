@@ -32,9 +32,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ["email", "password", "first_name", "last_name", "role", "school"]
 
     def validate_role(self, value):
-        if value not in [User.STUDENT, User.TEACHER]:
-            raise serializers.ValidationError("Self-registration is only available for students and teachers.")
+        if value not in [User.STUDENT, User.TEACHER, User.COACH]:
+            raise serializers.ValidationError(
+                "Self-registration is only available for students, teachers, and coaches."
+            )
         return value
+
+    def validate(self, attrs):
+        role = attrs.get("role")
+        school = attrs.get("school")
+        if role in [User.STUDENT, User.TEACHER, User.COACH] and not school:
+            raise serializers.ValidationError({"school": "A school must be selected for students, teachers, and coaches."})
+        return attrs
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
@@ -62,6 +71,10 @@ class CustomTokenSerializer(TokenObtainPairSerializer):
 class ClassSerializer(serializers.ModelSerializer):
     teacher_name = serializers.CharField(source="teacher.full_name", read_only=True)
     student_count = serializers.IntegerField(source="students.count", read_only=True)
+    teacher = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(role__in=[User.TEACHER, User.COACH]),
+        required=False,
+    )
 
     class Meta:
         model = Class

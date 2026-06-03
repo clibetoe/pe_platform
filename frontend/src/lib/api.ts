@@ -31,6 +31,32 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+function toFormData(data: Record<string, unknown>) {
+  const formData = new FormData();
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "") return;
+    if (value instanceof File) {
+      formData.append(key, value);
+      return;
+    }
+    if (value instanceof FileList) {
+      Array.from(value).forEach((file) => formData.append(key, file));
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item instanceof File) formData.append(key, item);
+        else formData.append(key, String(item));
+      });
+      return;
+    }
+    formData.append(key, String(value));
+  });
+
+  return formData;
+}
+
 api.interceptors.request.use((config) => {
   const token = Cookies.get("access_token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -85,8 +111,16 @@ export const authApi = {
 export const curriculumApi = {
   subjects: () => api.get("/curriculum/subjects/"),
   subject: (id: number) => api.get(`/curriculum/subjects/${id}/`),
+  topics: (params?: Record<string, unknown>) => api.get("/curriculum/topics/", { params }),
+  topic: (id: number) => api.get(`/curriculum/topics/${id}/`),
+  createTopic: (data: { subject: number; title: string; description?: string; order?: number }) =>
+    api.post("/curriculum/topics/", data),
   lessons: (params?: Record<string, unknown>) => api.get("/curriculum/lessons/", { params }),
   lesson: (id: number) => api.get(`/curriculum/lessons/${id}/`),
+  createLesson: (data: Record<string, unknown>) =>
+    api.post("/curriculum/lessons/", toFormData(data), {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
   markComplete: (id: number) => api.post(`/curriculum/lessons/${id}/mark_complete/`),
   markStarted: (id: number) => api.post(`/curriculum/lessons/${id}/mark_started/`),
   progress: () => api.get("/curriculum/progress/"),
